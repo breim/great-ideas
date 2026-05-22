@@ -2,39 +2,76 @@
 
 Signal-backed build opportunities, ranked into tiers. Does not brainstorm — mines.
 
+## Quick start
+
+Prerequisite: Claude Code installed.
+
+**1. Install** — clone this repo, symlink it into your skills directory, then restart your Claude Code session:
+
+```bash
+git clone <your-repo-url> ~/code/great-ideas
+ln -s ~/code/great-ideas ~/.claude/skills/great-ideas
+```
+
+**2. First fire** — generate a batch into a fresh file. Type this as a slash command:
+
+```
+/great-ideas voice AI devtools, global, solo builder, top 5, file=~/ideas/voice.md
+```
+
+The skill will ask only for the parameters you didn't provide, then mine the last 7 days of web signal and write 5 signal-backed ideas to `~/ideas/voice.md`.
+
+**3. First validate** — once the file has entries, rank the top 3:
+
+```
+/great-ideas validate 3 ~/ideas/voice.md
+```
+
+A `## Top 3` section is written at the top of the same file. See **Usage** sections below for all modes (fire, validate, refire) and the `/loop` pattern for continuous mining.
+
+## Why signal-backed
+
+Most "give me ideas" tools brainstorm: they recombine concepts the model already has and dress them up with confident prose. `great-ideas` mines: every entry must point at a real, dated post — a revenue milestone, a complaint thread, a search trend slope, a Show HN above 50 points — from the last 7 days. If a signal source does not exist, the idea does not ship. The skill stops at 2 entries rather than padding to 10. This trades volume for honesty: fewer ideas in the file, each one checkable in 30 seconds by clicking the source URL.
+
 ## What it does
 
-`great-ideas` is a Claude Code skill with three modes that share a single markdown file as their working surface.
+`great-ideas` is a Claude Code skill with three modes that share a single markdown file.
 
-- **fire mode** pulls live web signal from the last 7 days (Product Hunt, Reddit revenue posts, Hacker News, IndieHackers milestones, Google Trends, App Store charts, platform developer forums) and appends 5–10 concrete, in-scope, signal-backed opportunities to your ideas file. Every entry carries a dated source URL — no fabrication, no slop.
+- **fire mode** pulls live web signal from the last 7 days (Product Hunt, Reddit revenue posts, Hacker News, IndieHackers milestones, Google Trends, App Store charts, platform developer forums) and appends 5–10 concrete, in-scope, signal-backed opportunities to your ideas file. Every entry carries a dated source URL.
 - **validate mode** reads that same file (no WebSearch) and ranks every entry into S/A/B/C tiers using a five-dimension rubric (validation depth, buyer clarity, time-to-ship, killer risk fatality, edge fit). It writes a `## Top N` section at the top of the file, replacing any prior one.
 - **refire mode** runs multiple fire rounds back-to-back until the file reaches a target count N, rotating source emphasis per round to maximize coverage of the 7-day signal window. For when you want a burst, not a trickle.
 
 You fire (or refire) to collect; you validate to decide what to build next.
 
-## Install
+## How it stays honest
 
-This skill follows the standard Claude Code skill layout:
-
-```
-great-ideas/
-├── SKILL.md
-├── references/
-│   ├── fire.md
-│   ├── validate.md
-│   └── refire.md
-└── examples/
-    └── ideas.example.md
-```
-
-Drop the folder into your `~/.claude/skills/` directory (or install via the skills.sh registry once published) and Claude will pick up the `great-ideas` skill on the next session.
+- **Dated URLs are mandatory.** Every fire entry carries a real source URL within a 7-day window. No URL → idea drops before the file is touched.
+- **No padding to hit a count.** If a fire can only justify 4 entries, the file gets 4. Refire stops the moment two consecutive rounds come up thin. There is no quality knob to relax.
+- **Structural dedup.** Pain + buyer is the unique key. The same idea pitched at a new vertical does not count as new.
+- **Tier veto in validate.** An idea whose Trend signal is hand-wave cannot be S-tier, even if every other field is strong. Validation depth is a veto, not a weight.
+- **Hard caps.** 10 ideas per single fire (user-overridable but discouraged), 100 ideas per file ceiling, 10 rounds max per refire.
 
 ## Usage — fire mode
 
-Invoke the skill with a domain or market. The skill will ask for what it needs and not what you already provided.
+Invoke with a domain or market. The skill asks only for gaps you didn't fill in.
 
 ```
 /great-ideas voice AI devtools, global excluding Brazil, solo builder, 3-6 month horizon, top 7, file=~/ideas/voice-ai.md
+```
+
+A new entry in the file looks like this:
+
+```markdown
+### 2. Voice-first changelog assistant for devtool teams
+
+- **Pain:** devtools founders hate writing release notes; they ship weekly and the changelog is always 3 versions behind, which kills upgrade velocity for their customers.
+- **Why now:** Anthropic's tool use and OpenAI's voice mode both became cheap enough in Q1 2026 to do "dictate the changelog over breakfast" workflows; PR diff parsing is now a 50-line script.
+- **Buyer / ICP:** founders or DX leads at devtools companies shipping weekly (often 1–5 person teams in their first 12 months).
+- **Validation signal:** 220-upvote IndieHackers revenue post about a competing text-based tool ("changelog.ai") hitting $4k MRR in 8 weeks; clear unmet demand for the voice variant.
+- **Killer risk:** changelog.ai or a funded competitor adds voice in a sprint.
+- **Edge:** solo builder can ship the voice ingestion + diff binding in 2 weeks; funded teams will overbuild.
+- **Distribution reality:** ships today as a GitHub App + companion iOS shortcut; no platform GA waits.
+- **Trend signal:** https://www.indiehackers.com/post/example-changelog-mrr | 2026-05-21 | "changelog.ai hit $4k MRR — wish it had voice input from my phone"; 220 upvotes, 65 comments asking the same [example]
 ```
 
 The skill captures (asking only for the gaps):
@@ -48,7 +85,7 @@ The skill captures (asking only for the gaps):
 - **Scope filter rules** — any hard constraints (e.g., "no in-lens display", "must work with Stripe").
 - **Custom sources** — optional domain-specific forums or newsletters.
 
-Each fire appends new ideas with continued numbering. See [`examples/ideas.example.md`](examples/ideas.example.md) for the shape of an entry and the parameter header.
+Each fire appends new ideas with continued numbering.
 
 ## Usage — validate mode
 
@@ -118,15 +155,29 @@ Each scheduled round re-reads the file, continues the numbering, and dedupes aga
 
 See [`examples/ideas.example.md`](examples/ideas.example.md) for a complete sample file showing the parameter header, a Top N section, four numbered ideas in the full template, and the footer line.
 
-## Anti-patterns the skill refuses
+The skill itself is laid out like this:
 
-- Fabricated trend signals. Every fire entry needs a real, dated source URL.
-- Hand-waving validation. "People want this" is not signal; a $X MRR Reddit post or a rising Google Trends slope is.
-- Stuffing the batch with the same vertical to hit a number. Each fire requires at least 3 distinct verticals.
-- Padding refire rounds to hit N. If signal is thin, refire stops; it never relaxes the quality bar.
-- Inventing numeric scores in validate. The rubric is tier-based on purpose.
-- Pasting the full output into chat. The file is the artifact; chat is a 4–6 line status (6–8 for refire).
+```
+great-ideas/
+├── SKILL.md
+├── references/
+│   ├── fire.md
+│   ├── validate.md
+│   └── refire.md
+└── examples/
+    └── ideas.example.md
+```
+
+`SKILL.md` is the dispatcher (it routes by the first argument after `/great-ideas`); each `references/*.md` carries the full protocol for one mode.
+
+## Limitations
+
+- **Needs WebSearch.** fire and refire are useless offline. validate works offline because it only reads the file.
+- **Source URLs decay.** Dated URLs from a fire today may 404 in 90 days. validate does not re-check them; if you re-validate an old file, treat the rankings as "what we knew when the fire ran."
+- **Tier ranking is judgment, not measurement.** The five-dimension rubric in validate is Claude grading what is written in the file — it is not an independent fact-check of the sources.
+- **Domain exhaustion is real.** Niches without fresh signal every 7 days will hit the "two thin rounds = stop" rule in refire. The chat will tell you when this happens.
+- **No private-data integration.** The skill mines public web signal. It does not read your Linear, Slack, or customer interviews.
 
 ## License
 
-MIT.
+MIT — see [LICENSE](LICENSE).
