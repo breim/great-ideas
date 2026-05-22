@@ -4,27 +4,26 @@ Signal-backed build opportunities, ranked into tiers. Does not brainstorm — mi
 
 ## Quick start
 
-Prerequisite: Claude Code installed.
+Three commands.
 
-**1. Install** — clone this repo, symlink it into your skills directory, then restart your Claude Code session:
+**1. Install** — run once, then restart your Claude Code session:
 
 ```bash
-git clone <your-repo-url> ~/code/great-ideas
-ln -s ~/code/great-ideas ~/.claude/skills/great-ideas
+npx skills add breim/great-ideas
 ```
 
 **2. First fire** — generate a batch into a fresh file. Type this as a slash command:
 
 ```
-/great-ideas voice AI devtools, global, solo builder, top 5, file=~/ideas/voice.md
+/great-ideas B2B SaaS for SMBs, global, solo builder, top 5, file=~/ideas/saas.md
 ```
 
-The skill will ask only for the parameters you didn't provide, then mine the last 7 days of web signal and write 5 signal-backed ideas to `~/ideas/voice.md`.
+The skill will ask only for the parameters you didn't provide, then mine the last 7 days of web signal and write 5 signal-backed ideas to `~/ideas/saas.md`.
 
 **3. First validate** — once the file has entries, rank the top 3:
 
 ```
-/great-ideas validate 3 ~/ideas/voice.md
+/great-ideas validate 3 ~/ideas/saas.md
 ```
 
 A `## Top 3` section is written at the top of the same file. See **Usage** sections below for all modes (fire, validate, refire) and the `/loop` pattern for continuous mining.
@@ -56,22 +55,22 @@ You fire (or refire) to collect; you validate to decide what to build next.
 Invoke with a domain or market. The skill asks only for gaps you didn't fill in.
 
 ```
-/great-ideas voice AI devtools, global excluding Brazil, solo builder, 3-6 month horizon, top 7, file=~/ideas/voice-ai.md
+/great-ideas B2B SaaS for SMBs, global excluding Brazil, solo builder, 3-6 month horizon, top 7, file=~/ideas/saas.md
 ```
 
 A new entry in the file looks like this:
 
 ```markdown
-### 2. Voice-first changelog assistant for devtool teams
+### 2. Per-feature usage analytics for B2B SaaS
 
-- **Pain:** devtools founders hate writing release notes; they ship weekly and the changelog is always 3 versions behind, which kills upgrade velocity for their customers.
-- **Why now:** Anthropic's tool use and OpenAI's voice mode both became cheap enough in Q1 2026 to do "dictate the changelog over breakfast" workflows; PR diff parsing is now a 50-line script.
-- **Buyer / ICP:** founders or DX leads at devtools companies shipping weekly (often 1–5 person teams in their first 12 months).
-- **Validation signal:** 220-upvote IndieHackers revenue post about a competing text-based tool ("changelog.ai") hitting $4k MRR in 8 weeks; clear unmet demand for the voice variant.
-- **Killer risk:** changelog.ai or a funded competitor adds voice in a sprint.
-- **Edge:** solo builder can ship the voice ingestion + diff binding in 2 weeks; funded teams will overbuild.
-- **Distribution reality:** ships today as a GitHub App + companion iOS shortcut; no platform GA waits.
-- **Trend signal:** https://www.indiehackers.com/post/example-changelog-mrr | 2026-05-21 | "changelog.ai hit $4k MRR — wish it had voice input from my phone"; 220 upvotes, 65 comments asking the same [example]
+- **Pain:** B2B SaaS founders ship 5 features a sprint but cannot tell which ones drive retention. Mixpanel and Amplitude are priced for Series-B teams; PostHog is over-featured for a 2-person team.
+- **Why now:** Cloudflare Workers + ClickHouse Cloud crossed a pricing threshold in Q1 2026 where ingesting 10M events per month costs under $10. The "just-enough-analytics" niche became economically viable for a solo builder.
+- **Buyer / ICP:** technical founders at B2B SaaS startups (2–10 person, $5k–$100k MRR) who have analytics anxiety but no data engineer.
+- **Validation signal:** 180-upvote r/SaaS thread from a founder who ripped out Mixpanel after a $1.8k → $14k bill spike; 60+ comments asking "what did you replace it with?"
+- **Killer risk:** PostHog Cloud's free tier expands to cover this niche.
+- **Edge:** solo builder can ship a feature-event-correlation product without the kitchen-sink scope; funded teams add 20 features and lose the niche.
+- **Distribution reality:** ships today as a hosted SaaS + 50-line npm SDK; no platform dependency.
+- **Trend signal:** https://www.reddit.com/r/SaaS/comments/example-mixpanel-bill | 2026-05-20 | "I ripped out Mixpanel after they 8x'd my bill — went from $1.8k to $14k/mo. What's everyone using?" 180 upvotes, 64 comments [example]
 ```
 
 The skill captures (asking only for the gaps):
@@ -82,7 +81,7 @@ The skill captures (asking only for the gaps):
 - **Profit horizon** — 3–6, 6–12, or 12+ months.
 - **Batch size** — 5 to 10 ideas per fire.
 - **File path** — where the running list lives.
-- **Scope filter rules** — any hard constraints (e.g., "no in-lens display", "must work with Stripe").
+- **Scope filter rules** — any hard constraints (e.g., "must work with Stripe", "no enterprise-only plays").
 - **Custom sources** — optional domain-specific forums or newsletters.
 
 Each fire appends new ideas with continued numbering.
@@ -94,8 +93,8 @@ After at least one fire has populated the file, validate ranks the entries.
 ```
 /great-ideas validate
 /great-ideas validate 5
-/great-ideas validate 15 ~/ideas/voice-ai.md
-/great-ideas validate --top=20 --file=~/ideas/voice-ai.md
+/great-ideas validate 15 ~/ideas/saas.md
+/great-ideas validate --top=20 --file=~/ideas/saas.md
 ```
 
 A section like the following is written at the top of the file (replacing any prior Top N):
@@ -105,11 +104,11 @@ A section like the following is written at the top of the file (replacing any pr
 
 > Ranked from the entries below using the validate rubric. Re-run `/great-ideas validate N` to refresh. No WebSearch — reads the file only.
 
-1. **#7 — Auto-tagger for returning Shopify customers** `[S]` — $1k MRR in 6 weeks per the Reddit thread; named buyer (DTC ops leads, 50–200 person brands).
-2. **#3 — Voice-first changelog assistant** `[S]` — 220 IndieHackers upvotes; specific ICP (devtools founders with weekly releases).
-3. **#1 — Solo-friendly billing portal for AI APIs** `[A]` — strong signal and buyer, but waits on Anthropic billing API GA.
-4. **#9 — Notion-to-podcast pipeline** `[A]` — solid signal, edge is thin vs. funded competitors.
-5. **#12 — Compliance scanner for healthtech indie devs** `[B]` — buyer plausible but trend signal is 60 days old.
+1. **#7 — Per-feature usage analytics for B2B SaaS** `[S]` — 180-upvote r/SaaS thread on Mixpanel pricing exodus; named buyer (technical founders at $5k–$100k MRR teams).
+2. **#3 — Stripe webhook auditor for indie SaaS** `[S]` — recent IH post about a $5k revenue leak from a silent webhook failure; ships today as a Stripe Connect app.
+3. **#1 — Slack-native NPS collector for indie SaaS** `[A]` — strong signal and buyer, but distribution waits on Slack marketplace approval.
+4. **#9 — Churn-attribution dashboard for SaaS** `[A]` — solid signal, edge is thin vs. ChurnZero adding AI categorization next quarter.
+5. **#12 — Onboarding email split-tester for SaaS** `[B]` — buyer plausible but trend signal is 60 days old.
 
 **Tier distribution (all 14 ideas in the file):** S: 2 · A: 4 · B: 5 · C: 3
 **Drop notes:** #4 and #11 fell to C — duplicate buyer of #7.
@@ -122,8 +121,8 @@ The original ideas, their numbers, and their fields are not modified. The footer
 When you want to fill the file to a target count in a single sitting (instead of running fire repeatedly):
 
 ```
-/great-ideas refire 50 ~/ideas/voice-ai.md
-/great-ideas refire --target=30 --file=~/ideas/voice-ai.md
+/great-ideas refire 50 ~/ideas/saas.md
+/great-ideas refire --target=30 --file=~/ideas/saas.md
 ```
 
 Refire reuses the parameter header (domain, scope, builder profile, etc) already in the file, then runs fire rounds back-to-back, rotating sources per round (Product Hunt → Hacker News → App Store → developer forums → cycle) so each round mines a different slice of the same 7-day signal window. Stops automatically when:
@@ -140,7 +139,7 @@ Use refire when you want a burst — a Saturday morning session to take a file f
 For trickle-mining over time (instead of a burst in one session), the Claude Code `/loop` skill can re-invoke `great-ideas` on a schedule with **zero changes** to this skill:
 
 ```
-/loop 6h /great-ideas voice AI devtools, global ex-BR, solo, top 10, file=~/ideas/voice.md
+/loop 6h /great-ideas B2B SaaS for SMBs, global ex-BR, solo, top 10, file=~/ideas/saas.md
 ```
 
 Each scheduled round re-reads the file, continues the numbering, and dedupes against existing entries. The file grows in the background. Cancel through your `/loop` skill's normal cancel command.
