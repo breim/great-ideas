@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/banner.jpg" alt="great-ideas — signal-backed build opportunities, ranked into tiers" width="100%">
+  <img src="docs/assets/banner.png" alt="great-ideas — signal-backed build opportunities, ranked into tiers" width="100%">
 </p>
 
 # great-ideas
