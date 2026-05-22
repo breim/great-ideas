@@ -2,9 +2,9 @@
   <img src="docs/assets/banner.png" alt="great-ideas — signal-backed build opportunities, ranked into tiers" width="100%">
 </p>
 
-# great-ideas
+<h3 align="center">Great Ideas</h3>
 
-Signal-backed build opportunities, ranked into tiers. Does not brainstorm — mines.
+<p align="center">Signal-backed build opportunities, ranked into tiers. Does not brainstorm — mines.</p>
 
 ## Quick start
 
